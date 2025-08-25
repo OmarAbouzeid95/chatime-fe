@@ -1,5 +1,5 @@
 'use client';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useActionState, useEffect, HTMLProps, ReactNode } from 'react';
 import { Card, CardHeader, CardContent } from '../ui/card';
 import { Input } from '../ui/input';
@@ -24,10 +24,11 @@ export default function RoomForm({
 	ctaText,
 }: RoomFormProps) {
 	const [response, formAction, isPending] = useActionState(formHandler, null);
+	const router = useRouter();
 
 	useEffect(() => {
 		if (response?.data) {
-			redirect(`/chats/${response.data.room.uuid}`);
+			router.push(`/chats/${response.data.room.uuid}`);
 		}
 	}, [response]);
 
