@@ -2,6 +2,23 @@ import RoomForm from '@/components/server/RoomForm';
 import { createRoom, joinRoom } from '@/utils/actions/rooms';
 import { Plus, Merge } from 'lucide-react';
 
+const createRoomInput = {
+	name: 'name',
+	placeholder: 'Enter a name',
+	maxLength: 20,
+	required: true,
+};
+
+const joinRoomInputs = [
+	createRoomInput,
+	{
+		name: 'roomId',
+		placeholder: 'Enter room code',
+		maxLength: 20,
+		required: true,
+	},
+];
+
 export default function Home() {
 	return (
 		<div className='h-screen w-screen flex items-center justify-center'>
@@ -10,12 +27,7 @@ export default function Home() {
 					Icon={<Plus />}
 					title='Create a private room'
 					description={'Lorem ipsum dolor..'}
-					inputProps={{
-						name: 'name',
-						placeholder: 'Enter a name',
-						maxLength: 20,
-						required: true,
-					}}
+					inputs={[createRoomInput]}
 					formHandler={createRoom}
 					ctaText='Create room'
 				/>
@@ -23,12 +35,7 @@ export default function Home() {
 					Icon={<Merge />}
 					title='Join a private room'
 					description={'Lorem ipsum dolor..'}
-					inputProps={{
-						name: 'roomId',
-						placeholder: 'Enter room code',
-						maxLength: 20,
-						required: true,
-					}}
+					inputs={joinRoomInputs}
 					formHandler={joinRoom}
 					ctaText='Join room'
 				/>
