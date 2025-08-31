@@ -28,6 +28,7 @@ export default function RoomForm({
 
 	useEffect(() => {
 		if (response?.data) {
+			localStorage.setItem('user', JSON.stringify(response.data.user));
 			router.push(`/chats/${response.data.room.uuid}`);
 		}
 	}, [response]);

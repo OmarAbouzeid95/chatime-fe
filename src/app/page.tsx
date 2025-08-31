@@ -1,4 +1,4 @@
-import RoomForm from '@/components/server/RoomForm';
+import RoomForm from '@/components/client/RoomForm';
 import { createRoom, joinRoom } from '@/utils/actions/rooms';
 import { Plus, Merge } from 'lucide-react';
 

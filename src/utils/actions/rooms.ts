@@ -3,13 +3,16 @@
 export const createRoom = async (_: unknown, body: FormData) => {
 	try {
 		const name = body.get('name');
-		const res = await fetch(`${process.env.BACKEND_URL}/rooms/create`, {
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			method: 'POST',
-			body: JSON.stringify({ name }),
-		});
+		const res = await fetch(
+			`${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/create`,
+			{
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				method: 'POST',
+				body: JSON.stringify({ name }),
+			}
+		);
 		const data = await res.json();
 		if (!res.ok) {
 			return {
