@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { socket } from '@/utils/socket';
 import { useRouter, useParams } from 'next/navigation';
+import Message from '@/components/client/Message';
 
 export default function Home() {
 	const router = useRouter();
@@ -10,6 +11,7 @@ export default function Home() {
 	const [user, setUser] = useState<{ id: number; name: string } | undefined>(
 		undefined
 	);
+	const [messages, setMessages] = useState<any[]>([]);
 
 	useEffect(() => {
 		const { id: userId, name } = JSON.parse(localStorage.getItem('user') || '');
@@ -37,12 +39,20 @@ export default function Home() {
 			}
 		}
 
-		joinRoom();
+		async function getMessages() {
+			const res = await fetch(
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/messages/${roomId}?userId=${userId}`
+			);
+			const data = await res.json();
+			setMessages((prev) => [...prev, ...data]);
+		}
+
+		joinRoom().then(getMessages);
 
 		socket.emit('join', roomId);
 
 		socket.on('NEW_MESSAGE', (message) => {
-			console.log('New message: ', message);
+			setMessages((prev) => [...prev, message]);
 		});
 	}, []);
 
@@ -50,6 +60,15 @@ export default function Home() {
 		<div>
 			<p>User: {user?.name}</p>
 			<p>ID: {user?.id}</p>
+			<div className='p-4 flex flex-col'>
+				{messages.map((message) => (
+					<Message
+						key={message.uuid}
+						content={message.content}
+						primary={message.user.id === user?.id}
+					/>
+				))}
+			</div>
 		</div>
 	);
 }
