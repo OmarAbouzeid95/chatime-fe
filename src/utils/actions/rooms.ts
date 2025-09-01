@@ -34,13 +34,16 @@ export const joinRoom = async (_: unknown, body: FormData) => {
 	try {
 		const name = body.get('name');
 		const roomId = body.get('roomId');
-		const res = await fetch(`${process.env.BACKEND_URL}/rooms/join`, {
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			method: 'POST',
-			body: JSON.stringify({ name, roomId }),
-		});
+		const res = await fetch(
+			`${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/join`,
+			{
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				method: 'POST',
+				body: JSON.stringify({ name, roomId }),
+			}
+		);
 		const data = await res.json();
 		if (!res.ok) {
 			return {
