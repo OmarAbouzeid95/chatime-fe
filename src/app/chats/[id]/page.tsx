@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { socket } from '@/utils/socket';
 import { useRouter, useParams } from 'next/navigation';
 import Message from '@/components/client/Message';
+import { Textarea } from '@/components/ui/textarea';
+import { sendMessage } from '@/utils/actions/messages';
 
 export default function Home() {
 	const router = useRouter();
@@ -11,7 +13,21 @@ export default function Home() {
 	const [user, setUser] = useState<{ id: number; name: string } | undefined>(
 		undefined
 	);
+	const [text, setText] = useState('');
 	const [messages, setMessages] = useState<any[]>([]);
+
+	const onFormSubmit = () => {
+		sendMessage({ userId: user?.id as number, roomId, message: text })
+			.then((data: any) => {
+				if (data.error) {
+					throw new Error();
+				}
+				setMessages((prev) => [...prev, data]);
+			})
+			.catch((error) => {
+				console.log('something went wrong');
+			});
+	};
 
 	useEffect(() => {
 		const { id: userId, name } = JSON.parse(localStorage.getItem('user') || '');
@@ -52,7 +68,9 @@ export default function Home() {
 		socket.emit('join', roomId);
 
 		socket.on('NEW_MESSAGE', (message) => {
-			setMessages((prev) => [...prev, message]);
+			if (message.user.id !== userId) {
+				setMessages((prev) => [...prev, message]);
+			}
 		});
 	}, []);
 
@@ -60,7 +78,7 @@ export default function Home() {
 		<div>
 			<p>User: {user?.name}</p>
 			<p>ID: {user?.id}</p>
-			<div className='p-4 flex flex-col'>
+			<div className='px-4 flex flex-col-reverse mb-20'>
 				{messages.map((message) => (
 					<Message
 						key={message.uuid}
@@ -69,6 +87,22 @@ export default function Home() {
 					/>
 				))}
 			</div>
+			<form className='fixed w-full bottom-0 left-0 right-0 px-4 py-4 shadow- backdrop-blur-sm'>
+				<Textarea
+					className='relative block w-full'
+					placeholder='Message'
+					value={text}
+					onChange={(e) => setText(e.target.value)}
+					onKeyDown={(e) => {
+						if (e.repeat) return;
+						if (e.key === 'Enter' && !e.shiftKey) {
+							e.preventDefault();
+							onFormSubmit();
+							setText('');
+						}
+					}}
+				/>
+			</form>
 		</div>
 	);
 }

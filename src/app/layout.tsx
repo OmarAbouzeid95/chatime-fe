@@ -20,7 +20,9 @@ export default function RootLayout({
 	return (
 		<html lang='en'>
 			<body className={`${raleway.className} antialiased dark`}>
-				<QueryClientProvider>{children}</QueryClientProvider>
+				<main>
+					<QueryClientProvider>{children}</QueryClientProvider>
+				</main>
 			</body>
 		</html>
 	);
