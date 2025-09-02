@@ -22,12 +22,16 @@ export default function Home() {
 				if (data.error) {
 					throw new Error();
 				}
-				setMessages((prev) => [...prev, data]);
+				setMessages((prev) => [data, ...prev]);
 			})
 			.catch((error) => {
 				console.log('something went wrong');
 			});
 	};
+
+	useEffect(() => {
+		window.scrollTo(0, document.body.scrollHeight);
+	}, [messages]);
 
 	useEffect(() => {
 		const { id: userId, name } = JSON.parse(localStorage.getItem('user') || '');
@@ -60,7 +64,7 @@ export default function Home() {
 				`${process.env.NEXT_PUBLIC_BACKEND_URL}/messages/${roomId}?userId=${userId}`
 			);
 			const data = await res.json();
-			setMessages((prev) => [...prev, ...data]);
+			setMessages((prev) => [...data, ...prev]);
 		}
 
 		joinRoom().then(getMessages);
@@ -69,7 +73,7 @@ export default function Home() {
 
 		socket.on('NEW_MESSAGE', (message) => {
 			if (message.user.id !== userId) {
-				setMessages((prev) => [...prev, message]);
+				setMessages((prev) => [message, ...prev]);
 			}
 		});
 	}, []);
