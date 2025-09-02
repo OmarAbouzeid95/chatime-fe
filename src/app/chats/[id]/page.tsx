@@ -4,8 +4,11 @@ import { useEffect, useState } from 'react';
 import { socket } from '@/utils/socket';
 import { useRouter, useParams } from 'next/navigation';
 import Message from '@/components/client/Message';
+import PureEmojiPicker from '@/components/client/PureEmojiPicker';
 import { Textarea } from '@/components/ui/textarea';
 import { sendMessage } from '@/utils/actions/messages';
+import { SmilePlus } from 'lucide-react';
+import clsx from 'clsx';
 
 export default function Home() {
 	const router = useRouter();
@@ -15,6 +18,7 @@ export default function Home() {
 	);
 	const [text, setText] = useState('');
 	const [messages, setMessages] = useState<any[]>([]);
+	const [showEmoji, setShowEmoji] = useState(false);
 
 	const onFormSubmit = () => {
 		sendMessage({ userId: user?.id as number, roomId, message: text })
@@ -67,7 +71,11 @@ export default function Home() {
 			setMessages((prev) => [...data, ...prev]);
 		}
 
-		joinRoom().then(getMessages);
+		joinRoom()
+			.then(getMessages)
+			.catch(() => {
+				router.replace('/');
+			});
 
 		socket.emit('join', roomId);
 
@@ -91,12 +99,20 @@ export default function Home() {
 					/>
 				))}
 			</div>
-			<form className='fixed w-full bottom-0 left-0 right-0 px-4 py-4 shadow- backdrop-blur-sm'>
+			<div className={clsx(showEmoji ? 'block' : 'hidden')}>
+				<div
+					className='fixed inset-0 bg-transparent'
+					onClick={() => setShowEmoji(false)}
+				></div>
+				<PureEmojiPicker setText={setText} />
+			</div>
+			<form className='fixed w-full flex justify-between gap-2 bottom-0 left-0 right-0 px-4 py-4 backdrop-blur-sm'>
 				<Textarea
 					className='relative block w-full'
 					placeholder='Message'
 					value={text}
 					onChange={(e) => setText(e.target.value)}
+					onFocus={() => setShowEmoji(false)}
 					onKeyDown={(e) => {
 						if (e.repeat) return;
 						if (e.key === 'Enter' && !e.shiftKey) {
@@ -104,6 +120,14 @@ export default function Home() {
 							onFormSubmit();
 							setText('');
 						}
+					}}
+				/>
+				<SmilePlus
+					size={24}
+					className='w-10 p-2 border border-input shadow-xs bg-input/30 rounded-md h-auto text-muted-foreground cursor-pointer'
+					onClick={(e) => {
+						e.preventDefault();
+						setShowEmoji((prev) => !prev);
 					}}
 				/>
 			</form>
