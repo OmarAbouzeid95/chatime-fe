@@ -99,12 +99,12 @@ export default function Home() {
 					/>
 				))}
 			</div>
-			<div className={clsx(showEmoji ? 'block' : 'hidden')}>
+			<div>
 				<div
 					className='fixed inset-0 bg-transparent'
 					onClick={() => setShowEmoji(false)}
 				></div>
-				<PureEmojiPicker setText={setText} />
+				<PureEmojiPicker setText={setText} showEmoji={showEmoji} />
 			</div>
 			<form className='fixed w-full flex justify-between gap-2 bottom-0 left-0 right-0 px-4 py-4 backdrop-blur-sm'>
 				<Textarea
