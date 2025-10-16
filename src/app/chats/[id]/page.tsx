@@ -60,19 +60,29 @@ export default function Home() {
 			);
 			if (!res.ok) {
 				router.replace('/');
+				return false;
 			}
+			return true;
 		}
 
 		async function getMessages() {
 			const res = await fetch(
 				`${process.env.NEXT_PUBLIC_BACKEND_URL}/messages/${roomId}?userId=${userId}`
 			);
+			if (!res.ok) {
+				return router.replace('/');
+			}
 			const data = await res.json();
-			setMessages((prev) => [...data, ...prev]);
+			setMessages(data);
 		}
 
 		joinRoom()
-			.then(getMessages)
+			.then((success) => {
+				if (!success) {
+					throw new Error('Failed to join room');
+				}
+				getMessages();
+			})
 			.catch(() => {
 				router.replace('/');
 			});
@@ -101,7 +111,10 @@ export default function Home() {
 			</div>
 			<div>
 				<div
-					className='fixed inset-0 bg-transparent'
+					className={clsx(
+						'fixed inset-0 bg-transparent',
+						showEmoji ? 'block' : 'hidden'
+					)}
 					onClick={() => setShowEmoji(false)}
 				></div>
 				<PureEmojiPicker setText={setText} showEmoji={showEmoji} />
